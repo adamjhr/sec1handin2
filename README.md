@@ -8,7 +8,7 @@ Alice, Bob and Charlie are participating in a medical experiment in their local 
 
 The restrictions in the scenario above leave the Hospital and patients in a tight spot, since standard ML algorithms require access to plaintext data in order to train a model. Luckily, the researchers in the hospital are collaborating with a team of data scientists and security experts who are all aware of the latest advances in Federated Learning, which allows for distributed training of models using data held locally by different users. These experts have designed a Federated Learning algorithm that supports a technique called Secure Aggregation, which allows the algorithm to train a model from aggregate data encoding all the plaintext data individually held by each patient into a single value. In particular, in this scenario, it is sufficient for the patient data to be aggregated by summing all individual patient's values into one final aggregate value, which needs to be made available to the Hospital. Using this technique, neither the patients nor the Hospital get access to each patient's individual plaintext data.
 
-Design and implement a solution that allows for the 3 patients interacting among each other and with the Hospital in the scenario described above to compute an aggregate value of their private input values in such a way that only the Hospital learns this aggregate value. Consider that all individual values held by patients are integers in a range [0,...,R] and that the aggregated value is the sum of all individual values, which is also assumed to be in the same range. You must describe an adversarial model (or threat model) capturing the attacks by an adversary who behaves according to the scenario described above, explain how your solution works and why it guarantees security against such an adversary. 
+Design and implement a solution that allows for the 3 patients interacting among each other and with the Hospital in the scenario described above to compute an aggregate value of their private input values in such a way that only the Hospital learns this aggregate value. Consider that all individual values held by patients are integers in a range [0,...,R] and that the aggregated value is the sum of all individual values, which is also assumed to be in the same range. You must describe an adversarial model (or threat model) capturing the attacks by an adversary who behaves according to the scenario described above, explain how your solution works and why it guarantees security against such an adversary.
 
 Hint: Secure Aggregation for Federated Learning is a real-world practical technique.
 
@@ -23,3 +23,11 @@ Submission Instructions:
 - Please name your submission clearly using your Name/Student ID, e.g. Jane Doe - 36476832.zip, Jane Doe - 36476832 - Report.PDF, Jane Doe - 36476832 - code.c, Jone Doe - 36476832 - Readme.txt. This makes grading faster, so that you get feedback on your hand-in faster.
 
 ## Solution
+
+
+### Generate `server.crt` and `server.key`
+
+`openssl genrsa -out server.key 2048`
+
+`openssl req -new -x509 -sha256 -key server.key -out server.crt -days 3650`
+Common name: localhost
