@@ -9,16 +9,17 @@ func StringifyPort(port int) string {
 	return fmt.Sprintf(":%d", port)
 }
 
-func CreateShares(r int, data int, amount int) []int {
+func CreateShares(p int, data int, amount int) []int {
 	var shares []int
 	var totalShares int
 
-	for i := 0; i < amount; i++ {
-		share := rand.Intn(r-1) + 1
+	for i := 0; i < amount-1; i++ {
+		share := rand.Intn(p-1) + 1
 		shares = append(shares, share)
 		totalShares += share
 	}
 
-	shares = append(shares, (data-totalShares)%r)
+	shares = append(shares, data-totalShares)
+
 	return shares
 }
