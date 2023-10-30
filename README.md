@@ -24,6 +24,59 @@ Submission Instructions:
 
 ## Solution
 
+### Adversarial Model
+
+The parties taking part in the protocol do not trust each other with their personal data, thus the protocol should be secure with a *dishonest majority*. Furthermore, the protocol should also be secure under the assumption that the adversary is *adaptive*. It is however assumed that the adversaey is *passive*, and doesn't stray away from following the protocol.
+
+Finally, the adversary also follows the Dolev-Yao, and thus has full control of the network.
+
+Based on this adversarial model, here is a summary of the security requirements and assumptions for the protocol:
+- None of those who take part of the protocol stray away from it
+- It should not reveal the data of one patient to another
+- It should not reveal the data of any single patient to the hospital
+- The protocol should ensure the confidentiality of messages sent between patients/hospital
+- The protocol should ensure the integrity of messages sent between patients/hospital
+- The protocol should ensure authenticity of messages sent between patients/hospital
+
+## Protocol Design
+
+To fulfil the requirement of not revealing data to any other patient/hospital, it is necessary to use *Secure Multi-Party Computation*, which allows one to distribute a computation across several machines without revealing any of the individual pieces of data. In this case, the computation is *Secure Aggregation*, which simply involves summing all the patients data together. This can be done using *n-out-of-n additive secret sharing*, which divides a patients data into *n* shares. The data can only be recovered once all *n* shares are added together. This means that the patient won't share their secret data unless they give away all the shares. 
+
+To fulfil the requirements of confidentiality, integrity and authenticity, *Transport Layer Security* is used. It addresses each one of these concerns, and is tried and tested.
+- It addresses confidentiality through symmetric cryptography.
+- It addresses integrity through MAC.
+- It addresses authenticity through digital certificates.
+
+
+The steps that the hospital takes are the following:
+1. Wait for all the patients to register themselves. I make the assumption that if a patient registers with the hospital, they are taking part in the protocol.
+2. Each time a patient registers, send their port to all the other patients.
+3. After waiting a certain amount of time, tell all patients that the computation can now start.
+4. Wait till it receives shares from all the patients.
+5. Add the shares together: $(s_1 + s_2 + ... + s_n) \ \% \ p$, where $n$ is the amount of patients and $p$ is the order of the cyclic group $Z^*_p$.
+	- I use a cyclic group to prevent integer overflow. The order of the group should be the max size of the expected final result.
+
+The steps that each patient takes are the following:
+1. Choose a number $x∈Z^*_p$ that represents the patient data.
+2. Register their port at the hospital.
+3. Keep track of ports of other patients, sent by the hospital.
+4. When signal from hospital to start computation received:
+	1. Divide their secret into $n$ parts, where $n$ is the amount of registered patients (including themselves)
+		- This is done by choosing $n-1$ random positive integers within $Z^*_p$.
+		- The final share is calculated with $s_n = d - (s_0 + s_1 + ... + s_{n-1}) \ \% \ p$, where $s_0 - s_{n-1}$ are the previously chosen shares, and *d* is the patient data
+	1. Send $n-1$ shares to other patients.
+	2. Wait till shares from all other patients have been received.
+	3. Add received shares and own unsent share together.
+	4. Send the result to the hospital.
+
+Of course, all communication happens over *TLS*.
+
+### Implementation
+
+A few shortcuts i took for the implementation of the protocol:
+- I do not handle cases where someone strays from the protocol. This means that if the adversary 
+- I use the same digital certificate for all patients, and the hospital. In reality each would have their own certificate.
+
 
 ### Generate `server.crt` and `server.key`
 
